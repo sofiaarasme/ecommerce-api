@@ -1,23 +1,14 @@
 services:
-  app:
-    build: .
-    container_name: ecommerce_app
-    environment:
-      - DATABASE_URL=postgresql://postgres:123456@postgres:5432/ecommerce_db
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
-
-  postgres:
+  db:
     image: postgres:15
     container_name: ecommerce_db
+    restart: always
     environment:
-      POSTGRES_USER: postgres 
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: ecommerce_db
     ports:
-      - "5435:5435"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
