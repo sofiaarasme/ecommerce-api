@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from config import Base, engine, get_db
+from config import Base, engine
+from modules.product.infrastructure.product_controller import router as product_router
 
 # Esto asegura que las tablas de la base de datos se creen
 Base.metadata.create_all(bind=engine)
@@ -20,3 +21,5 @@ async def test_db():
         return {"message": "Connection successful"}
     except Exception as e:
         return {"error": str(e)}
+    
+app.include_router(product_router, prefix="/products")
