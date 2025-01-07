@@ -29,3 +29,9 @@ python -m venv venv
 # On macOS/Linux:  
 source venv/bin/activate  
 ```
+
+### 2. Run the project
+```bash  
+# Terminal command to run app:  
+uvicorn main:app --reload
+```
