@@ -20,15 +20,20 @@ class ProductRepositoryImplementation(ProductRepository):
         self.db.refresh(product)
         return product
 
-    def update(self, product_id: int, product_data: dict) -> Product:
-        product = self.db.query(Product).filter(Product.id == product_id).first()
+    def update(self, product_id: int, product_data: dict):
+        product = self.get_by_id(product_id)
+        if not product:
+            return 'Product not found'
         for key, value in product_data.items():
             setattr(product, key, value)
         self.db.commit()
         self.db.refresh(product)
         return product
 
-    def delete(self, product_id: int) -> None:
-        product = self.db.query(Product).filter(Product.id == product_id).first()
+    def delete(self, product_id: int):
+        product = self.get_by_id(product_id)
+        if not product:
+            return 'Product not found'
         self.db.delete(product)
         self.db.commit()
+        return product

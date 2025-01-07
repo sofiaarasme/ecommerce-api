@@ -19,7 +19,7 @@ class ProductInterface(ABC):
 
     @property
     @abstractmethod
-    def price(self) -> int:
+    def price(self) -> float:
         pass
 
     @property
