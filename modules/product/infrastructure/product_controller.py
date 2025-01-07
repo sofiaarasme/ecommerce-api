@@ -17,7 +17,7 @@ async def read_products(service: ProductService = Depends(get_product_service)):
     return service.get_all_products()
 
 @router.get("/{product_id}")
-async def read_product(product_id: int, service: ProductService = Depends(get_product_service)):
+async def read_product(product_id: str, service: ProductService = Depends(get_product_service)):
     product = service.get_product_by_id(product_id)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -34,7 +34,7 @@ async def create_product(
 
 @router.put("/{product_id}")
 async def update_product(
-    product_id: int,
+    product_id: str,
     product_data: ProductUpdateDto,
     db: Session = Depends(get_db),
 ):
@@ -46,7 +46,7 @@ async def update_product(
     return updated_product
 
 @router.delete("/{product_id}")
-async def delete_product(product_id: int, db: Session = Depends(get_db)):
+async def delete_product(product_id: str, db: Session = Depends(get_db)):
     repository = ProductRepositoryImplementation(db)
     service = ProductService(repository)
     deleted_product = service.delete_product(product_id)

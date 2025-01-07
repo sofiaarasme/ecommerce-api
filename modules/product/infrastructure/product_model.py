@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
 from config import Base
+from datetime import datetime
 
 class Product(Base):
     __tablename__ = "products"
@@ -13,6 +14,6 @@ class Product(Base):
     cost = Column(Float)
     margin = Column(Float)
     price = Column(Float)
-    created_at = Column(TIMESTAMP, nullable=False)
-    updated_at = Column(TIMESTAMP, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow) 
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
