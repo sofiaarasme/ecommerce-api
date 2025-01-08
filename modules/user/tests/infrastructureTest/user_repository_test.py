@@ -1,10 +1,12 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from uuid import uuid4
 from config import Base
 from modules.user.infrastructure.user_model import User, Role
 from modules.user.infrastructure.user_repository import UserRepositoryImplementation
 from modules.carts.infrastructure.car_model import Cart
+from modules.order.infrastructure.order_model import Order, OrderItem 
 
 DATABASE_URL = "sqlite:///:memory:"
 
@@ -30,11 +32,11 @@ def user_repository(session):
 def test_register_user(user_repository, session):
     user_data = {
         "username": "testuser",
-        "email": "test@example.com",
+        "email": f"test{uuid4()}@example.com",  
         "hashed_password": "password",
         "role": Role.CUSTOMER.value
     }
     user = User(**user_data)
     registered_user = user_repository.register(user)
     assert registered_user.id is not None
-    assert registered_user.email == "test@example.com"
+    assert registered_user.email == user_data["email"]
