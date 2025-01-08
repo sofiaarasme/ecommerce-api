@@ -13,6 +13,7 @@ class UserService:
     def get_user_by_id(self, user_id: int) -> User:
         return self.repository.get_by_id(user_id)
 
-    def register_new_user(self, user_data: dict):
+    def register_new_user(self, user_data: dict)-> User:
+        user_data['role'] = user_data['role'].value
         new_user = User(**user_data)
         return self.repository.register(new_user)

@@ -17,6 +17,6 @@ class User(Base):
     username = Column(String(50), nullable=False, unique=True)
     email = Column(String(50), index=True, unique=True)
     hashed_password = Column(String)
-    role = Column(Enum(Role), nullable=False)
+    role = Column(String(15), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
