@@ -23,3 +23,4 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     cart = relationship("Cart", back_populates="user")
+    orders = relationship("Order", back_populates="user")

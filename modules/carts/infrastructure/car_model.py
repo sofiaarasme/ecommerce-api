@@ -27,3 +27,4 @@ class CartItem(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     cart = relationship("Cart", back_populates="items")
+    product = relationship("Product")

@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
-from typing import List
-from .order_item import OrderItemInterface
 from datetime import datetime
 
-class OrderInterface(ABC):
+class OrderItemInterface(ABC):
 
     @property
     @abstractmethod
@@ -13,7 +11,17 @@ class OrderInterface(ABC):
 
     @property
     @abstractmethod
-    def user_id(self) -> UUID:
+    def order_id(self) -> UUID:
+        pass
+
+    @property
+    @abstractmethod
+    def product_id(self) -> UUID:
+        pass
+
+    @property
+    @abstractmethod
+    def quantity(self) -> int:
         pass
 
     @property
@@ -24,19 +32,4 @@ class OrderInterface(ABC):
     @property
     @abstractmethod
     def updated_at(self) -> datetime:
-        pass
-
-    @property
-    @abstractmethod
-    def total_amount(self) -> float:
-        pass
-
-    @property
-    @abstractmethod
-    def status(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def items(self) -> List[OrderItemInterface]:
         pass
