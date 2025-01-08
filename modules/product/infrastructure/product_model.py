@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
 from config import Base
 from datetime import datetime
+from sqlalchemy.orm import relationship
 
 class Product(Base):
     __tablename__ = "products"
@@ -17,3 +18,5 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.utcnow) 
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
+    
+    inventory = relationship("InventoryModel", back_populates="product")
