@@ -1,55 +1,46 @@
 import pytest
 from pydantic import ValidationError
-from modules.product.application.dtos.product_create_dto import ProductCreateDto  # Asegúrate de ajustar la ruta según tu estructura de proyecto
+from modules.product.application.dtos.product_create_dto import ProductCreateDto
 
 def test_valid_product_create_dto():
-    dto = ProductCreateDto(
-        code='P001',
-        name='Product 1',
-        description='Description of Product 1',
-        price=120.0,
-        margin=20.0,
-        cost=100.0,
-        is_active=True
-    )
-    assert dto.code == 'P001'
-    assert dto.name == 'Product 1'
-    assert dto.description == 'Description of Product 1'
-    assert dto.price == 120.0
-    assert dto.margin == 20.0
-    assert dto.cost == 100.0
-    assert dto.is_active is True
-
-def test_invalid_price_type():
-    with pytest.raises(ValidationError):
-        ProductCreateDto(
-            code='P001',
-            name='Product 1',
-            description='Description of Product 1',
-            price='not a float',  # Valor inválido
-            margin=20.0,
-            cost=100.0,
-            is_active=True
-        )
-
-def test_missing_code():
-    with pytest.raises(ValidationError):
-        ProductCreateDto(
-            name='Product 1',
-            description='Description of Product 1',
-            price=120.0,
-            margin=20.0,
-            cost=100.0,
-            is_active=True
-        )
+    data = {
+        "code": "SP123",
+        "name": "Sample Product",
+        "description": "This is a sample product",
+        "margin": 0.25,
+        "cost": 10.0,
+        "is_active": True
+    }
+    product = ProductCreateDto(**data)
+    assert product.code == data["code"]
+    assert product.name == data["name"]
+    assert product.description == data["description"]
+    assert product.margin == data["margin"]
+    assert product.cost == data["cost"]
+    assert product.is_active == data["is_active"]
+    assert product.price == pytest.approx(13.33, rel=1e-2)  # Verificando el precio calculado (10 / (1 - 0.25))
 
 def test_default_is_active():
-    dto = ProductCreateDto(
-        code='P001',
-        name='Product 1',
-        description='Description of Product 1',
-        price=120.0,
-        margin=20.0,
-        cost=100.0
-    )
-    assert dto.is_active is True
+    data = {
+        "code": "SP123",
+        "name": "Sample Product",
+        "description": "This is a sample product",
+        "margin": 0.25,
+        "cost": 10.0
+    }
+    product = ProductCreateDto(**data)
+    assert product.is_active is True
+    assert product.price == pytest.approx(13.33, rel=1e-2)  # Verificando el precio calculado (10 / (1 - 0.25))
+
+def test_invalid_product_margin():
+    data = {
+        "code": "SP123",
+        "name": "Sample Product",
+        "description": "This is a sample product",
+        "margin": 1.5,  # Invalid margin
+        "cost": 10.0,
+        "is_active": True
+    }
+    with pytest.raises(ValidationError):
+        ProductCreateDto(**data)
+
