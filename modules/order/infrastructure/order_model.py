@@ -9,6 +9,10 @@ class OrderStatus(str, Enum):
     PENDING = 'pending'
     COMPLETED = 'completed'
     CANCELLED = 'cancelled'
+    
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type, handler):
+        return handler.generate_schema(str)
 
 class Order(Base):
     __tablename__ = 'orders'

@@ -1,7 +1,7 @@
 from modules.order.domain.order_repository_interface import OrderRepository
 from modules.carts.domain.cart_repository_interface import CartRepositoryInterface
-from modules.user.infrastructure.user_model import User
-from modules.order.infrastructure.order_model import Order, OrderItem
+from modules.user.infrastructure.user_model import User, Role
+from modules.order.infrastructure.order_model import Order, OrderItem, OrderStatus
 from uuid import UUID
 
 class OrderService:
@@ -39,3 +39,30 @@ class OrderService:
 
     def get_order_by_id(self, order_id: UUID):
         return self.order_repository.get_order_by_id(order_id)
+    
+    def update_order_status(self, order_id: UUID, status: OrderStatus, current_user: User):
+        order = self.get_order_by_id(order_id)
+        if not order:
+            raise ValueError("Order not found")
+        
+        if current_user.role != Role.MANAGER:
+            raise ValueError("Only managers can update order status")
+
+        order.status = status
+        self.order_repository.update_order(order)
+        return order
+
+    def cancel_order(self, order_id: UUID, current_user: User):
+        order = self.get_order_by_id(order_id)
+        if not order:
+            raise ValueError("Order not found")
+        
+        if current_user.role == Role.CUSTOMER and order.user_id != current_user.id:
+            raise ValueError("Customers can only cancel their own orders")
+        
+        if current_user.role == Role.CUSTOMER and order.status != OrderStatus.PENDING:
+            raise ValueError("Customers can only cancel pending orders")
+
+        order.status = OrderStatus.CANCELLED
+        self.order_repository.update_order(order)
+        return order

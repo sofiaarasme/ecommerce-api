@@ -25,3 +25,8 @@ class OrderRepositoryImplementation(OrderRepository):
 
     def get_order_by_id(self, order_id: UUID) -> Order:
         return self.db.query(Order).filter(Order.id == order_id).first()
+    
+    def update_order(self, order: Order) -> Order:
+        self.db.commit()
+        self.db.refresh(order)
+        return order

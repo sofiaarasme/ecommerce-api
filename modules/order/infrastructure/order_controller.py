@@ -8,6 +8,7 @@ from modules.order.infrastructure.order_repository import OrderRepositoryImpleme
 from modules.carts.infrastructure.cart_repository import CartRepositoryImplementation
 from modules.user.infrastructure.user_model import User
 from modules.order.infrastructure.order_model import Order, OrderItem
+from modules.order.application.dtos.update_order_dto import UpdateOrderDto
 from config import get_db
 
 router = APIRouter()
@@ -45,6 +46,28 @@ async def get_order_by_id(
     if order is None or order.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Order not found")
     return serialize_order(order)
+
+@router.put("/{order_id}/status")
+async def update_order_status(
+    update_data: UpdateOrderDto, 
+    current_user: User = Depends(get_current_user),
+    service: OrderService = Depends(get_order_service)
+):
+    try:
+        return serialize_order(service.update_order_status(update_data.order_id, update_data.status, current_user))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.put("/{order_id}/cancel")
+async def cancel_order(
+    update_data: UpdateOrderDto, 
+    current_user: User = Depends(get_current_user),
+    service: OrderService = Depends(get_order_service)
+):
+    try:
+        return serialize_order(service.cancel_order(update_data.order_id, current_user))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 def serialize_order(order: Order) -> dict:
     return {
