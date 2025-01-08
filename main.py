@@ -7,8 +7,8 @@ from modules.inventory.infrastructure.inventory_controller import router as inve
 from modules.user.infrastructure.user_controller import router as user_router
 from modules.carts.infrastructure.car_controller import router as cart_router
 from modules.order.infrastructure.order_controller import router as order_router
+from modules.reports.report_controller import router as report_router
 
-# Esto asegura que las tablas de la base de datos se creen
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -35,3 +35,5 @@ app.include_router(user_router, prefix="/users", tags=["Users"])
 app.include_router(cart_router, prefix="/carts", tags=["Carts"])
 
 app.include_router(order_router, prefix="/orders", tags=["Orders"])
+
+app.include_router(report_router, prefix="/reports", tags=["Reports"])
