@@ -25,7 +25,7 @@ def test_user_update_dto_with_missing_role():
     assert dto.username == "testuser"
     assert dto.email == "test@example.com"
     assert dto.password == "securepassword123"
-    assert dto.role == Role.MANAGER  # Default role should be MANAGER
+    assert dto.role == Role.MANAGER  
 
 def test_user_update_dto_with_partial_data():
     data = {
@@ -35,14 +35,14 @@ def test_user_update_dto_with_partial_data():
     assert dto.username == "testuser"
     assert dto.email is None
     assert dto.password is None
-    assert dto.role == Role.MANAGER  # Default role should be MANAGER
+    assert dto.role == Role.MANAGER  
 
 def test_user_update_dto_invalid_role():
     data = {
         "username": "testuser",
         "email": "test@example.com",
         "password": "securepassword123",
-        "role": "invalidrole"  # Invalid role
+        "role": "invalidrole" 
     }
     with pytest.raises(ValidationError):
         UserUpdateDto(**data)
