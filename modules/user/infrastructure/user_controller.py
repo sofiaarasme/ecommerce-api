@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from modules.user.application.user_service import UserService
 from modules.user.application.dtos.user_register_dto import UserCreateDto
 from modules.user.application.dtos.user_login_dto import UserLoginDto
+from modules.user.infrastructure.user_model import User
 from modules.user.infrastructure.user_repository import UserRepositoryImplementation
 from config import get_db
 from fastapi.security import OAuth2PasswordBearer
@@ -21,14 +22,11 @@ def get_current_user(
     token: str = Depends(oauth2_scheme),
     service: UserService = Depends(get_user_service)
 ):
-    try:
-        payload = verify_token(token)
-        user = service.get_user_by_id(payload["user_id"])
-        if not user:
-            raise HTTPException(status_code=401, detail="User not found")
-        return user
-    except Exception:
+    user_id = verify_token(token)
+    user = service.get_user_by_id(user_id)
+    if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
+    return user
 
 def get_superadmin_user(current_user=Depends(get_current_user)):
     if current_user.role != "superadmin":
@@ -46,17 +44,16 @@ async def register_user(
 ):
     repository = UserRepositoryImplementation(db)
     service = UserService(repository)
+    return user_data
 
 @router.post("/create_superadmin")
-async def create_superadmin(
-    user_data: UserCreateDto,
-    service: UserService = Depends(get_user_service)
-):
-    existing_user = service.get_user_by_email(user_data.email)
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Superadmin already exists")
-    user_data.role = "superadmin"
-    return service.register_new_user(user_data.dict())
+async def create_superadmin(user_data: UserCreateDto, db: Session = Depends(get_db)):
+    try:
+        user_data_dict = user_data.dict()
+        user_service = UserService(repository=UserRepositoryImplementation(db))
+        return user_service.register_new_user(user_data_dict)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/managers")
 async def create_manager(
@@ -108,3 +105,7 @@ async def login_for_access_token(
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     token = create_access_token(data={"user_id": user.id})
     return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/me")
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return current_user

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from http.client import HTTPException
+from fastapi import HTTPException
 from jose import JWTError, jwt
 from typing import Union
 import uuid
@@ -16,7 +16,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     
-    # Convert UUID to string if present
     for key, value in to_encode.items():
         if isinstance(value, uuid.UUID):
             to_encode[key] = str(value)
@@ -37,3 +36,5 @@ def verify_token(token: str):
         return user_id
     except JWTError:
         raise credentials_exception
+    except Exception:
+        raise HTTPException(401, detail="Invalid token")
