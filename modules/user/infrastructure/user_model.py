@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
 from config import Base
 from datetime import datetime
+from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 
 class Role(PyEnum):
@@ -20,3 +21,5 @@ class User(Base):
     role = Column(String(15), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    cart = relationship("Cart", back_populates="user")
