@@ -45,7 +45,7 @@ class OrderService:
         if not order:
             raise ValueError("Order not found")
         
-        if current_user.role != Role.MANAGER:
+        if current_user.role != Role.MANAGER.value:
             raise ValueError("Only managers can update order status")
 
         order.status = status
