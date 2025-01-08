@@ -1,6 +1,6 @@
 import pytest
 from uuid import UUID
-from modules.user.tests.domainTest.user_interface import UserConcrete, Role  # Asegúrate de importar la clase correcta
+from modules.user.tests.domainTest.user_interface import UserConcrete, Role 
 
 def test_user_concrete_initialization():
     user = UserConcrete(username="testuser", email="test@example.com", hashed_password="hashed_password", role=Role.CUSTOMER)
