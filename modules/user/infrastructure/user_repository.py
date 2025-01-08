@@ -14,8 +14,23 @@ class UserRepositoryImplementation(UserRepository):
     def get_by_id(self, user_id: int) -> User:
         return self.db.query(User).filter(User.id == user_id).first()
 
+    def get_by_email(self, email: str) -> User:
+        return self.db.query(User).filter(User.email == email).first()
+
+    def get_by_role(self, role: str) -> List[User]:
+        return self.db.query(User).filter(User.role == role).all()
+
     def register(self, user: User) -> User:
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
         return user
+
+    def update(self, user: User) -> User:
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def delete(self, user: User):
+        self.db.delete(user)
+        self.db.commit()

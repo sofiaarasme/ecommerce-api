@@ -9,5 +9,5 @@ class RoleEnum(str, Enum):
 class UserCreateDto(BaseModel):
     username: str
     email: str
-    hashed_password: str  
+    password: str  
     role: RoleEnum
