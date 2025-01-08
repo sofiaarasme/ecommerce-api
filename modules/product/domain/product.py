@@ -12,6 +12,7 @@ class ProductInterface(ABC):
     @abstractmethod
     def code(self) -> str:
         pass
+    
     @property
     @abstractmethod
     def name(self) -> str:
