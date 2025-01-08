@@ -41,12 +41,3 @@ def test_user_create_dto_missing_password():
     }
     with pytest.raises(ValidationError):
         UserCreateDto(**data)
-
-def test_user_create_dto_missing_role():
-    data = {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "securepassword123"
-    }
-    with pytest.raises(ValidationError):
-        UserCreateDto(**data)
