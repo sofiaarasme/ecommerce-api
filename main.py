@@ -8,13 +8,13 @@ from modules.inventory.infrastructure.inventory_controller import router as inve
 # Esto asegura que las tablas de la base de datos se creen
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="E-Commerce API",
+    description="API desarrollada para gestionar los endpoints de un ECommerce",
+    version="1.0.0",
+)
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
-
-@app.get("/test-db")
+@app.get("/test-db", tags=["Database Test Connection"])
 async def test_db():
     try:
         with engine.connect() as connection:
@@ -23,6 +23,6 @@ async def test_db():
     except Exception as e:
         return {"error": str(e)}
     
-app.include_router(product_router, prefix="/products")
+app.include_router(product_router, prefix="/products", tags=["Products"])
 
-app.include_router(inventory_router, prefix="/inventories")
+app.include_router(inventory_router, prefix="/inventories", tags=["Inventory"])
