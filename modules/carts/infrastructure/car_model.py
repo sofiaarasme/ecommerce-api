@@ -13,8 +13,8 @@ class Cart(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    user = relationship("User", back_populates="cart")
     items = relationship("CartItem", back_populates="cart")
+    user = relationship("User", back_populates="cart")
 
 class CartItem(Base):
     __tablename__ = 'cart_items'
@@ -27,4 +27,3 @@ class CartItem(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     cart = relationship("Cart", back_populates="items")
-    product = relationship("Product")
