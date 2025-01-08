@@ -10,4 +10,4 @@ class UserCreateDto(BaseModel):
     username: str
     email: str
     password: str  
-    role: RoleEnum
+    role: RoleEnum = RoleEnum.CUSTOMER

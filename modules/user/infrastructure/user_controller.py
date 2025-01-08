@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from modules.user.application.user_service import UserService
 from modules.user.application.dtos.user_register_dto import UserCreateDto
 from modules.user.application.dtos.user_login_dto import UserLoginDto
-from modules.user.infrastructure.user_model import User
+from modules.user.application.dtos.user_update_dto import UserUpdateDto
+from modules.user.infrastructure.user_model import User, Role
 from modules.user.infrastructure.user_repository import UserRepositoryImplementation
 from config import get_db
 from fastapi.security import OAuth2PasswordBearer
@@ -42,18 +43,36 @@ async def register_user(
     user_data: UserCreateDto,
     db: Session = Depends(get_db),
 ):
-    repository = UserRepositoryImplementation(db)
-    service = UserService(repository)
-    return user_data
+    try:
+        user_service = UserService(repository=UserRepositoryImplementation(db))   
+        created_user = user_service.register_new_user(user_data.dict())
+        return {"message": "User registered successfully", "user": created_user}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @router.post("/create_superadmin")
-async def create_superadmin(user_data: UserCreateDto, db: Session = Depends(get_db)):
+async def create_superadmin(
+    user_data: UserCreateDto,
+    db: Session = Depends(get_db),
+):
     try:
-        user_data_dict = user_data.dict()
         user_service = UserService(repository=UserRepositoryImplementation(db))
-        return user_service.register_new_user(user_data_dict)
+        
+        existing_superadmin = user_service.get_users_by_role(Role.SUPERADMIN.value)
+        
+        if existing_superadmin:
+            raise HTTPException(status_code=400, detail="A superadmin already exists. Cannot create another one.")
+        
+        else:
+            user_data_dict = user_data.dict()
+            user_data_dict['role'] = "superadmin"
+            created_superadmin = user_service.register_new_user(user_data_dict)
+
+            return {"message": "Superadmin created successfully", "user": created_superadmin}
+    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @router.post("/managers")
 async def create_manager(
@@ -61,7 +80,8 @@ async def create_manager(
     current_user=Depends(get_superadmin_user),
     service: UserService = Depends(get_user_service)
 ):
-    user_data.role = "manager"
+    user_data.role = Role.MANAGER.value
+
     return service.register_new_user(user_data.dict())
 
 @router.get("/managers")
@@ -73,27 +93,30 @@ async def get_managers(
 
 @router.put("/managers/{manager_id}")
 async def update_manager(
-    manager_id: int,
-    user_data: UserCreateDto,
+    manager_id: str,
+    user_data: UserUpdateDto,
     current_user=Depends(get_superadmin_user),
     service: UserService = Depends(get_user_service)
 ):
     manager = service.get_user_by_id(manager_id)
     if not manager:
         raise HTTPException(status_code=404, detail="Manager not found")
-    user_data.role = "manager"
+
     return service.update_user(manager_id, user_data.dict())
 
 @router.delete("/managers/{manager_id}")
 async def delete_manager(
-    manager_id: int,
+    manager_id: str,
     current_user=Depends(get_superadmin_user),
     service: UserService = Depends(get_user_service)
 ):
     manager = service.get_user_by_id(manager_id)
     if not manager:
         raise HTTPException(status_code=404, detail="Manager not found")
-    return service.delete_user(manager_id)
+    else:
+        service.delete_user(manager_id)
+
+    return "Manager deleted"
 
 @router.post("/login")
 async def login_for_access_token(
@@ -109,3 +132,12 @@ async def login_for_access_token(
 @router.get("/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+@router.put("/{user_id}")
+async def update_user(
+    user_id: str,
+    user_data: UserUpdateDto,
+    current_user: User = Depends(get_current_user),
+    service: UserService = Depends(get_user_service)
+):
+    return service.update_user(user_id, user_data.dict(), current_user)
